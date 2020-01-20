@@ -3,9 +3,9 @@
 # Exit immediately on non-zero return codes.
 set -ex
 
-# Run start command if only options given.
+# Run start command and append if only options given.
 if [ "${1:0:1}" = '-' ]; then
-  set -- ./srv/homeassistant/bin/hass
+  set -- ./srv/homeassistant/bin/hass "$@"
 fi
 
 # Run boot scripts before starting the server.
