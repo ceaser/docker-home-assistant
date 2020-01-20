@@ -12,10 +12,10 @@ fi
 if [ "$1" = "./srv/homeassistant/bin/hass" ]; then
   ## Change version if necessary
   . /srv/homeassistant/bin/activate
-  if [ "$HOMEASSISTANT_VERSION" != "$(cat /.version)" ]; then
-    pip3 install homeassistant==$HOMEASSISTANT_VERSION
-  elif [ "$HOMEASSISTANT_VERSION" == "pre" ]; then
+  if [ "$HOMEASSISTANT_VERSION" == "pre" ]; then
     pip3 install --pre --upgrade homeassistant
+  elif [ "$HOMEASSISTANT_VERSION" != "$(cat /.version)" ]; then
+    pip3 install homeassistant==$HOMEASSISTANT_VERSION
   fi
 
   set -- gosu homeassistant "$@"
