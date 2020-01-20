@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # Exit immediately on non-zero return codes.
-set -ex
+set -e
 
 # Run start command and append if only options given.
 if [ "${1:0:1}" = '-' ]; then
