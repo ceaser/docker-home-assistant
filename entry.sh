@@ -14,12 +14,11 @@ if [ "$1" = "./srv/homeassistant/bin/hass" ]; then
   . /srv/homeassistant/bin/activate
   if [ "$HOMEASSISTANT_VERSION" == "pre" ]; then
     pip3 install --pre --upgrade homeassistant
-  elif [ "$HOMEASSISTANT_VERSION" != "$(cat /.version)" ]; then
+  elif [ "$HOMEASSISTANT_VERSION" != "$(cat /config/HA_VERSION)" ]; then
     pip3 install homeassistant==$HOMEASSISTANT_VERSION
   fi
 
-  export LANG=en_US.UTF-8
-  locale-gen
+  update-ca-certificates --verbose
   set -- gosu homeassistant "$@"
 fi
 

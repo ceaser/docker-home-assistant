@@ -1,20 +1,29 @@
-#FROM homeassistant/home-assistant:0.99.2
-FROM debian:stable-slim
+FROM ubuntu:bionic-20200112
+MAINTAINER Ceaser Larry
 
+ENV LANG en_US.UTF-8
 ARG HOMEASSISTANT_VERSION
 ENV HOMEASSISTANT_VERSION ${HOMEASSISTANT_VERSION:-0.99.2}
 ENV CONFIG_DIR=/config
 
+ARG DEB_PROXY
+ENV DEB_PROXY ${DEB_PROXY}
+RUN [ -z "$DEB_PROXY" ] || \
+  echo "Acquire::http { Proxy \"$DEB_PROXY\"; };" > /etc/apt/apt.conf.d/02proxy
+
 RUN set -ex \
-	# Install dependencies.
-	&& apt-get update \
+  && apt-get update \
   && apt-get install -y \
+    software-properties-common \
+  && add-apt-repository ppa:deadsnakes/ppa \
+  && apt-get update \
+  && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    python3.7 \
     autoconf \
     automake \
     build-essential \
     cmake \
     ffmpeg \
-    git \
     gosu \
     libass-dev \
     libavcodec-dev \
@@ -33,29 +42,35 @@ RUN set -ex \
     libvorbis-dev \
     libx264-dev \
     libx264-dev \
-    locales \
     pkg-config \
-    python3-opencv \
-    python3-pip \
-    python3.7 \
+    #python3-opencv \
+    #python3-pip \
     python3.7-dev \
     python3.7-venv \
-    rsync \
     unzip \
     wget \
     yasm \
     zlib1g-dev \
-	&& apt-get clean \
+    locales \
+    locales-all \
+    curl \
+  && apt-get clean \
+  && mkdir /tmp/build && cd /tmp/build \
+  && curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py \
+  && python3.7 get-pip.py \
+  && pip3.7 install --upgrade pip \
+  && cd / && rm -rf /tmp/build \
+  && apt-get remove -y curl \
   && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 RUN mkdir -p /config /srv/homeassistant
 
-RUN cd /srv/homeassistant \
-    && python3 -m venv . \
-    && . /srv/homeassistant/bin/activate \
-    && pip3 install wheel \
-    && echo "$HOMEASSISTANT_VERSION" > /.version \
-    && pip3 install "homeassistant==$HOMEASSISTANT_VERSION"
+RUN locale-gen en_US.UTF-8 \
+    && cd /srv/homeassistant \
+    && python3.7 -m venv . \
+    && . ./bin/activate \
+    && pip3.7 install wheel \
+    && pip3.7 install "homeassistant==$HOMEASSISTANT_VERSION"
 
 ## Create /config and ensure Home Assistant works
 RUN /srv/homeassistant/bin/hass -c /config --script ensure_config \
