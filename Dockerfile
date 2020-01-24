@@ -1,9 +1,16 @@
 FROM ubuntu:bionic-20200112
 MAINTAINER Ceaser Larry
 
-ENV LANG en_US.UTF-8
+ENV LANG C.UTF-8
+ENV TERM="xterm" LANG="C.UTF-8" LC_ALL="C.UTF-8"
 ARG HOMEASSISTANT_VERSION
 ENV HOMEASSISTANT_VERSION ${HOMEASSISTANT_VERSION:-0.99.2}
+ARG HOMEASSISTANT_UID
+ENV HOMEASSISTANT_UID ${HOMEASSISTANT_UID:-1000}
+ARG HOMEASSISTANT_GID
+ENV HOMEASSISTANT_GID ${HOMEASSISTANT_GID:-1000}
+ENV CHANGE_CONFIG_DIR_OWNERSHIP true
+ENV CHANGE_VENV_DIR_OWNERSHIP true
 ENV CONFIG_DIR=/config
 
 ARG DEB_PROXY
@@ -11,13 +18,14 @@ ENV DEB_PROXY ${DEB_PROXY}
 RUN [ -z "$DEB_PROXY" ] || \
   echo "Acquire::http { Proxy \"$DEB_PROXY\"; };" > /etc/apt/apt.conf.d/02proxy
 
+ARG DEBIAN_FRONTEND=noninteractive
 RUN set -ex \
   && apt-get update \
   && apt-get install -y \
     software-properties-common \
   && add-apt-repository ppa:deadsnakes/ppa \
   && apt-get update \
-  && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+  &&  apt-get install -y \
     python3.7 \
     autoconf \
     automake \
@@ -74,12 +82,9 @@ RUN locale-gen en_US.UTF-8 \
 
 ## Create /config and ensure Home Assistant works
 RUN /srv/homeassistant/bin/hass -c /config --script ensure_config \
-  && /bin/rm -rf /config/*
-
-RUN useradd -rm homeassistant -G dialout \
-    && chown -R homeassistant:homeassistant /config /srv/homeassistant \
-    && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
-    && locale-gen
+  && /bin/rm -rf /config/* \
+  && echo "C.UTF-8 UTF-8" > /etc/locale.gen \
+  && locale-gen
 
 COPY entry.sh /entry.sh
 RUN chmod 755 /entry.sh

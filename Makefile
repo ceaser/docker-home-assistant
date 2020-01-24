@@ -3,7 +3,7 @@
 DOCKER_REPO=registry.home.divergentlogic.com
 DOCKER_APPNAME=home-assistant
 VERSION=$(shell git describe --tags 2> /dev/null || echo "latest")
-ARGS=-v $(shell pwd)/data:/data -p 8123:8123 --entrypoint bash
+ARGS=-p 8123:8123 -v $(shell pwd)/venv:/venv -v $(shell pwd)/config:/config
 BUILD_ARGS=--build-arg DEB_PROXY=http://172.17.0.2:3142
 BUILD_OBJS=.cacher
 
