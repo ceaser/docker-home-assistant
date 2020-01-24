@@ -14,6 +14,7 @@ RUN set -ex \
     build-essential \
     cmake \
     ffmpeg \
+    git \
     gosu \
     libass-dev \
     libavcodec-dev \
@@ -32,12 +33,14 @@ RUN set -ex \
     libvorbis-dev \
     libx264-dev \
     libx264-dev \
+    locales \
     pkg-config \
     python3-opencv \
     python3-pip \
     python3.7 \
     python3.7-dev \
     python3.7-venv \
+    rsync \
     unzip \
     wget \
     yasm \
@@ -55,10 +58,13 @@ RUN cd /srv/homeassistant \
     && pip3 install "homeassistant==$HOMEASSISTANT_VERSION"
 
 ## Create /config and ensure Home Assistant works
-RUN /srv/homeassistant/bin/hass -c /config --script ensure_config
+RUN /srv/homeassistant/bin/hass -c /config --script ensure_config \
+  && /bin/rm -rf /config/*
 
 RUN useradd -rm homeassistant -G dialout \
-    && chown -R homeassistant:homeassistant /config /srv/homeassistant
+    && chown -R homeassistant:homeassistant /config /srv/homeassistant \
+    && echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
+    && locale-gen
 
 COPY entry.sh /entry.sh
 RUN chmod 755 /entry.sh

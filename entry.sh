@@ -18,6 +18,8 @@ if [ "$1" = "./srv/homeassistant/bin/hass" ]; then
     pip3 install homeassistant==$HOMEASSISTANT_VERSION
   fi
 
+  export LANG=en_US.UTF-8
+  locale-gen
   set -- gosu homeassistant "$@"
 fi
 
