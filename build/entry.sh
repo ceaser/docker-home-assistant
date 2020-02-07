@@ -11,8 +11,10 @@ fi
 # Run boot scripts before starting the server.
 if [ "$1" = "/srv/homeassistant/bin/hass" ]; then
   if [ -z "$(id -u homeassistant 2>/dev/null)" ]; then
-    useradd -U -d /home/hassistant -s /bin/false homeassistant
+    mkdir /home/homeassistant
+    useradd -U -d /home/homeassistant -s /bin/false homeassistant
     usermod -G dialout homeassistant
+    chown homeassistant:homeassistant /home/homeassistant
   fi
 
   # Setup user/group ids
