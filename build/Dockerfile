@@ -9,6 +9,7 @@ RUN set -ex \
   && apt-get install -y \
     software-properties-common \
   && add-apt-repository ppa:deadsnakes/ppa \
+  && add-apt-repository ppa:jonathonf/ffmpeg-4 \
   && apt-get update \
   &&  apt-get install -y \
     autoconf \
@@ -31,6 +32,8 @@ RUN set -ex \
     libfreetype6-dev \
     libgtk-3-dev \
     libjpeg-dev \
+    libmariadbclient-dev \
+    libmariadbclient-dev-compat \
     libpng-dev \
     libssl-dev \
     libswresample-dev \
@@ -123,13 +126,14 @@ RUN set -ex \
 RUN mkdir -p /config /srv/homeassistant
 
 ARG HOMEASSISTANT_VERSION
-ENV HOMEASSISTANT_VERSION ${HOMEASSISTANT_VERSION:-0.99.2}
+ENV HOMEASSISTANT_VERSION ${HOMEASSISTANT_VERSION:-0.111.2}
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
     && locale-gen \
     && cd /srv/homeassistant \
     && python3.7 -m venv . \
     && . ./bin/activate \
     && pip3.7 install wheel \
+    && pip3.7 install mysqlclient \
     && cp -aR /usr/local/lib/python3.7/dist-packages/opencv* /srv/homeassistant/lib/python3.7/site-packages/ \
     && cp -aR /usr/local/lib/python3.7/dist-packages/cv2 /srv/homeassistant/lib/python3.7/site-packages/ \
     && pip3.7 install "homeassistant==$HOMEASSISTANT_VERSION" \
