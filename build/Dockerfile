@@ -126,7 +126,7 @@ RUN set -ex \
 RUN mkdir -p /config /srv/homeassistant
 
 ARG HOMEASSISTANT_VERSION
-ENV HOMEASSISTANT_VERSION ${HOMEASSISTANT_VERSION:-0.111.2}
+ENV HOMEASSISTANT_VERSION ${HOMEASSISTANT_VERSION:-0.111.4}
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen \
     && locale-gen \
     && cd /srv/homeassistant \
