@@ -5,13 +5,17 @@ set -ex
 
 # Run start command and append if only options given.
 if [ "${1:0:1}" = '-' ]; then
-  set -- ./srv/homeassistant/bin/hass "$@"
+  set -- /srv/homeassistant/bin/hass "$@"
 fi
 
 # Run boot scripts before starting the server.
-if [ "$1" = "./srv/homeassistant/bin/hass" ]; then
-  useradd -U -d /config -s /bin/false homeassistant
-  usermod -G users homeassistant
+if [ "$1" = "/srv/homeassistant/bin/hass" ]; then
+  if [ -z "$(id -u homeassistant 2>/dev/null)" ]; then
+    mkdir -p /home/homeassistant
+    useradd -U -d /home/homeassistant -s /bin/false homeassistant
+    usermod -G dialout homeassistant
+    chown homeassistant:homeassistant /home/homeassistant
+  fi
 
   # Setup user/group ids
   if [ ! -z "${HOMEASSISTANT_UID}" ]; then
@@ -30,7 +34,7 @@ if [ "$1" = "./srv/homeassistant/bin/hass" ]; then
 
       # Cleanup the temp home dir
       if [ ! "${HOMEASSISTANT_UID}" -eq 0 ]; then
-        usermod -d /config homeassistant
+        usermod -d /home/homeassistant homeassistant
         rm -Rf /tmp/temphome
       fi
     fi
@@ -77,7 +81,6 @@ if [ "$1" = "./srv/homeassistant/bin/hass" ]; then
   fi
 
   update-ca-certificates --verbose
-  bash
   set -- gosu homeassistant "$@"
 fi
 
