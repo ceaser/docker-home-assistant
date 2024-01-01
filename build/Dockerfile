@@ -12,6 +12,7 @@ RUN set -ex \
   && add-apt-repository ppa:jonathonf/ffmpeg-4 \
   && apt-get update \
   &&  apt-get install -y \
+    libturbojpeg \
     autoconf \
     automake \
     build-essential \
